@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: auth
+  template:
+    metadata:
+      labels:
+        app: auth
+    spec:
+      containers:
+      - name: auth
+        image: fernandopereira/auth:v0.1  # Use your Docker Hub repo name and tag
+        ports:
+        - containerPort: 5000
+        env:
+        - name: POSTGRES_USER
+          value: "postgres"
+        - name: POSTGRES_PASSWORD
+          value: "postgres"
+        - name: POSTGRES_HOST
+          value: "postgres"
+        - name: POSTGRES_DB
+          value: "auth_db"
+        resources:
+          requests:
+            memory: "128Mi"  # Memory request
+            cpu: "250m"      # CPU request
+          limits:
+            memory: "256Mi"  # Memory limit
+            cpu: "500m"      # CPU limit
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth
+spec:
+  ports:
+  - port: 5000          # Port exposed by the service
+    targetPort: 5000  # Port on the container
+  selector:
+    app: auth
